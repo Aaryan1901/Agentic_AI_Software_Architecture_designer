@@ -1,18 +1,27 @@
 
 import { ProjectRequirements } from '@/components/RequirementsForm';
 import { ArchitectureRecommendation } from '@/components/ArchitectureDisplay';
+import { searchProjectInformation, SearchResult } from './searchService';
 
 // This is a mock service that would be replaced with actual AI logic or API calls
 export const generateArchitectureRecommendation = async (
   requirements: ProjectRequirements
 ): Promise<ArchitectureRecommendation> => {
-  // Simulate API call delay
+  console.log("Generating architecture recommendation for:", requirements);
+  
+  // First, search for relevant information about the project
+  const searchQuery = `${requirements.projectType} application with ${requirements.features.join(', ')} features`;
+  const searchResults = await searchProjectInformation(searchQuery);
+  
+  // Simulate API call delay for the actual recommendation generation
   await new Promise((resolve) => setTimeout(resolve, 2000));
 
-  // Simple logic to determine architecture pattern based on requirements
+  // Use the search results to influence the recommendation
+  // In a real implementation, this would use more sophisticated AI logic
   let pattern = 'Microservices';
   let description = 'A microservices architecture with distributed components';
   
+  // Adjust recommendation based on search results and requirements
   if (requirements.projectType === 'webapp' && requirements.scalability === 'low') {
     pattern = 'Monolithic MVC';
     description = 'A traditional monolithic application with Model-View-Controller pattern';
@@ -45,7 +54,8 @@ export const generateArchitectureRecommendation = async (
     deployment,
     diagram: 'placeholder', // In a real implementation, this would be generated
     pros,
-    cons
+    cons,
+    searchResults // Include the search results in the recommendation
   };
 };
 

@@ -17,7 +17,7 @@ const Header: React.FC = () => {
         <nav className="flex items-center gap-4">
           <Button variant="ghost" size="sm">Features</Button>
           <Button variant="ghost" size="sm">Documentation</Button>
-          <Button variant="ghost" size="sm">About</Button>
+          <Button variant="ghost" size="sm">Research</Button>
           <Button variant="outline" size="sm">Login</Button>
         </nav>
       </div>

@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { ProjectRequirements } from './RequirementsForm';
 import { getDiagramByPattern } from './DiagramTemplates';
+import { SearchResult } from '@/services/searchService';
 
 export interface ArchitectureRecommendation {
   pattern: string;
@@ -17,6 +18,7 @@ export interface ArchitectureRecommendation {
   diagram: string; // This would be a diagram representation (SVG or component reference)
   pros: string[];
   cons: string[];
+  searchResults?: SearchResult[]; // Add search results to the recommendation
 }
 
 interface Framework {
@@ -56,7 +58,8 @@ const ArchitectureDisplay: React.FC<ArchitectureDisplayProps> = ({
       <Card className="w-full">
         <CardContent className="flex flex-col items-center justify-center p-6 min-h-[400px]">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-architect mb-4"></div>
-          <p className="text-muted-foreground">Analyzing requirements and designing architecture...</p>
+          <p className="text-muted-foreground">Searching for project information and designing architecture...</p>
+          <p className="text-sm text-muted-foreground mt-2">Analyzing requirements and industry best practices...</p>
         </CardContent>
       </Card>
     );
@@ -82,6 +85,37 @@ const ArchitectureDisplay: React.FC<ArchitectureDisplayProps> = ({
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* If we have search results, show them first */}
+        {recommendation.searchResults && recommendation.searchResults.length > 0 && (
+          <div className="mb-4 border rounded-md p-4 bg-muted/20">
+            <h3 className="text-lg font-semibold mb-2">Research Findings</h3>
+            <p className="text-sm text-muted-foreground mb-3">
+              The AI searched for information relevant to your project requirements:
+            </p>
+            <div className="space-y-3">
+              {recommendation.searchResults.slice(0, 3).map((result, index) => (
+                <div key={index} className="border-l-2 border-architect pl-3">
+                  <h4 className="font-medium text-sm">{result.title}</h4>
+                  <p className="text-xs text-muted-foreground">{result.summary}</p>
+                  <div className="flex justify-between items-center mt-1">
+                    <span className="text-xs italic">{result.source}</span>
+                    {result.url && (
+                      <a 
+                        href={result.url}
+                        target="_blank"
+                        rel="noopener noreferrer" 
+                        className="text-xs text-architect hover:underline"
+                      >
+                        Learn more
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div>
           <h3 className="text-lg font-semibold mb-2">Recommended Pattern</h3>
           <div className="flex items-center">

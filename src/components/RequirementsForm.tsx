@@ -34,6 +34,7 @@ const RequirementsForm: React.FC<RequirementsFormProps> = ({ onSubmit }) => {
     timeline: '',
     team: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (name: keyof ProjectRequirements, value: string) => {
     setRequirements(prev => ({ ...prev, [name]: value }));
@@ -51,7 +52,13 @@ const RequirementsForm: React.FC<RequirementsFormProps> = ({ onSubmit }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(requirements);
+    setIsSubmitting(true);
+    
+    // Small delay to show the submitting state
+    setTimeout(() => {
+      setIsSubmitting(false);
+      onSubmit(requirements);
+    }, 500);
   };
 
   const commonFeatures = [
@@ -82,6 +89,7 @@ const RequirementsForm: React.FC<RequirementsFormProps> = ({ onSubmit }) => {
               value={requirements.projectName}
               onChange={(e) => handleChange('projectName', e.target.value)}
               placeholder="My Software Project"
+              required
             />
           </div>
           
@@ -93,6 +101,7 @@ const RequirementsForm: React.FC<RequirementsFormProps> = ({ onSubmit }) => {
               onChange={(e) => handleChange('description', e.target.value)}
               placeholder="Describe the purpose and goals of your software project..."
               rows={4}
+              required
             />
           </div>
           
@@ -102,6 +111,7 @@ const RequirementsForm: React.FC<RequirementsFormProps> = ({ onSubmit }) => {
               <Select 
                 onValueChange={(value) => handleChange('projectType', value)}
                 value={requirements.projectType}
+                required
               >
                 <SelectTrigger id="projectType">
                   <SelectValue placeholder="Select type" />
@@ -122,6 +132,7 @@ const RequirementsForm: React.FC<RequirementsFormProps> = ({ onSubmit }) => {
               <Select 
                 onValueChange={(value) => handleChange('scalability', value)}
                 value={requirements.scalability}
+                required
               >
                 <SelectTrigger id="scalability">
                   <SelectValue placeholder="Select scalability" />
@@ -163,6 +174,7 @@ const RequirementsForm: React.FC<RequirementsFormProps> = ({ onSubmit }) => {
               <Select 
                 onValueChange={(value) => handleChange('budget', value)}
                 value={requirements.budget}
+                required
               >
                 <SelectTrigger id="budget">
                   <SelectValue placeholder="Select budget" />
@@ -181,6 +193,7 @@ const RequirementsForm: React.FC<RequirementsFormProps> = ({ onSubmit }) => {
               <Select 
                 onValueChange={(value) => handleChange('timeline', value)}
                 value={requirements.timeline}
+                required
               >
                 <SelectTrigger id="timeline">
                   <SelectValue placeholder="Select timeline" />
@@ -199,6 +212,7 @@ const RequirementsForm: React.FC<RequirementsFormProps> = ({ onSubmit }) => {
               <Select 
                 onValueChange={(value) => handleChange('team', value)}
                 value={requirements.team}
+                required
               >
                 <SelectTrigger id="team">
                   <SelectValue placeholder="Select team size" />
@@ -216,8 +230,16 @@ const RequirementsForm: React.FC<RequirementsFormProps> = ({ onSubmit }) => {
           <Button 
             type="submit" 
             className="w-full bg-architect hover:bg-architect-dark"
+            disabled={isSubmitting}
           >
-            Generate Architecture Recommendations
+            {isSubmitting ? (
+              <>
+                <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-b-transparent"></span>
+                <span>Researching and Analyzing...</span>
+              </>
+            ) : (
+              'Generate Architecture Recommendations'
+            )}
           </Button>
         </form>
       </CardContent>
