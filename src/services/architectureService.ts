@@ -1,7 +1,8 @@
 
 import { ProjectRequirements } from '@/components/RequirementsForm';
 import { ArchitectureRecommendation } from '@/components/ArchitectureDisplay';
-import { searchProjectInformation, SearchResult } from './searchService';
+import { searchProjectInformation, SearchResult, LLMModel } from './searchService';
+import { generateDiagramFromRequirements } from './diagramService';
 
 // This is a mock service that would be replaced with actual AI logic or API calls
 export const generateArchitectureRecommendation = async (
@@ -9,9 +10,13 @@ export const generateArchitectureRecommendation = async (
 ): Promise<ArchitectureRecommendation> => {
   console.log("Generating architecture recommendation for:", requirements);
   
-  // First, search for relevant information about the project
+  // Get the selected LLM model from localStorage, or default if not set
+  const selectedModel = (localStorage.getItem('selectedLLM') as LLMModel) || 'default';
+  console.log("Using LLM model:", selectedModel);
+  
+  // First, search for relevant information about the project using the selected LLM
   const searchQuery = `${requirements.projectType} application with ${requirements.features.join(', ')} features`;
-  const searchResults = await searchProjectInformation(searchQuery);
+  const searchResults = await searchProjectInformation(searchQuery, selectedModel);
   
   // Simulate API call delay for the actual recommendation generation
   await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -45,6 +50,17 @@ export const generateArchitectureRecommendation = async (
   // Map the pros and cons
   const pros = getProsForPattern(pattern);
   const cons = getConsForPattern(pattern);
+  
+  // Generate diagrams using our new diagram service
+  const flowchartDiagram = await generateDiagramFromRequirements(requirements, {
+    type: 'flowchart',
+    title: `${requirements.projectName} Flow Diagram`
+  });
+  
+  const useCaseDiagram = await generateDiagramFromRequirements(requirements, {
+    type: 'usecase',
+    title: `${requirements.projectName} Use Case Diagram`
+  });
 
   return {
     pattern,
@@ -52,10 +68,14 @@ export const generateArchitectureRecommendation = async (
     frameworks,
     libraries,
     deployment,
-    diagram: 'placeholder', // In a real implementation, this would be generated
+    diagram: 'placeholder', // No longer used directly, we have specific diagrams now
     pros,
     cons,
-    searchResults // Include the search results in the recommendation
+    searchResults, // Include the search results in the recommendation
+    diagrams: {
+      flowchart: flowchartDiagram,
+      useCase: useCaseDiagram
+    }
   };
 };
 

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { ProjectRequirements } from './RequirementsForm';
 import { getDiagramByPattern } from './DiagramTemplates';
 import { SearchResult } from '@/services/searchService';
+import { GeneratedDiagram } from '@/services/diagramService';
 
 export interface ArchitectureRecommendation {
   pattern: string;
@@ -19,6 +20,13 @@ export interface ArchitectureRecommendation {
   pros: string[];
   cons: string[];
   searchResults?: SearchResult[]; // Add search results to the recommendation
+  diagrams?: {
+    flowchart: GeneratedDiagram;
+    useCase: GeneratedDiagram;
+    component?: GeneratedDiagram;
+    sequence?: GeneratedDiagram;
+    class?: GeneratedDiagram;
+  };
 }
 
 interface Framework {
@@ -53,6 +61,9 @@ const ArchitectureDisplay: React.FC<ArchitectureDisplayProps> = ({
   loading,
   onRefine,
 }) => {
+  const [diagramTab, setDiagramTab] = useState<string>("pattern");
+  const [diagramType, setDiagramType] = useState<string>("flowchart");
+  
   if (loading) {
     return (
       <Card className="w-full">
@@ -68,6 +79,57 @@ const ArchitectureDisplay: React.FC<ArchitectureDisplayProps> = ({
   if (!recommendation) {
     return null;
   }
+
+  // Function to render the PlantUML code or SVG diagram
+  const renderDiagram = () => {
+    if (diagramTab === "pattern") {
+      return getDiagramByPattern(recommendation.pattern);
+    } else if (diagramTab === "dynamic" && recommendation.diagrams) {
+      let diagram: GeneratedDiagram | undefined;
+      
+      switch (diagramType) {
+        case "flowchart":
+          diagram = recommendation.diagrams.flowchart;
+          break;
+        case "usecase":
+          diagram = recommendation.diagrams.useCase;
+          break;
+        case "component":
+          diagram = recommendation.diagrams.component;
+          break;
+        case "sequence":
+          diagram = recommendation.diagrams.sequence;
+          break;
+        case "class":
+          diagram = recommendation.diagrams.class;
+          break;
+        default:
+          diagram = recommendation.diagrams.flowchart;
+      }
+      
+      if (diagram) {
+        // In a real application, this SVG would be generated from the PlantUML code
+        // For now, we're using the pre-generated SVG content
+        return (
+          <div className="flex flex-col gap-4">
+            <div 
+              className="w-full border p-4 rounded bg-white"
+              dangerouslySetInnerHTML={{ __html: diagram.svgContent }} 
+            />
+            <div className="border p-3 rounded-md bg-gray-50">
+              <h4 className="text-sm font-medium mb-2">PlantUML Code</h4>
+              <pre className="text-xs overflow-auto p-2 bg-gray-100 rounded">
+                {diagram.plantUmlCode}
+              </pre>
+            </div>
+          </div>
+        );
+      }
+    }
+    
+    // Fallback to pattern diagram
+    return getDiagramByPattern(recommendation.pattern);
+  };
 
   return (
     <Card className="w-full">
@@ -193,13 +255,62 @@ const ArchitectureDisplay: React.FC<ArchitectureDisplayProps> = ({
         </Tabs>
 
         <div className="border p-4 rounded-md bg-muted/30">
-          <h3 className="text-lg font-semibold mb-4">Architecture Diagram</h3>
-          <div className="flex justify-center p-4 bg-white rounded border">
-            {/* Architecture diagram from template */}
-            <div className="w-full aspect-[16/9] bg-white">
-              {getDiagramByPattern(recommendation.pattern)}
+          <h3 className="text-lg font-semibold mb-4">Architecture Visualization</h3>
+          
+          <Tabs value={diagramTab} onValueChange={setDiagramTab}>
+            <TabsList className="w-full mb-4">
+              <TabsTrigger value="pattern">Pattern Diagram</TabsTrigger>
+              <TabsTrigger value="dynamic">Dynamic Diagrams</TabsTrigger>
+            </TabsList>
+            
+            {diagramTab === "dynamic" && (
+              <div className="mb-4">
+                <TabsList className="w-full">
+                  <TabsTrigger 
+                    value="flowchart" 
+                    className={diagramType === "flowchart" ? "bg-architect text-white" : ""}
+                    onClick={() => setDiagramType("flowchart")}
+                  >
+                    Flowchart
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="usecase" 
+                    className={diagramType === "usecase" ? "bg-architect text-white" : ""}
+                    onClick={() => setDiagramType("usecase")}
+                  >
+                    Use Case
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="component" 
+                    className={diagramType === "component" ? "bg-architect text-white" : ""}
+                    onClick={() => setDiagramType("component")}
+                  >
+                    Component
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="sequence" 
+                    className={diagramType === "sequence" ? "bg-architect text-white" : ""}
+                    onClick={() => setDiagramType("sequence")}
+                  >
+                    Sequence
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="class" 
+                    className={diagramType === "class" ? "bg-architect text-white" : ""}
+                    onClick={() => setDiagramType("class")}
+                  >
+                    Class
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+            )}
+            
+            <div className="flex justify-center p-4 bg-white rounded border">
+              <div className="w-full aspect-[16/9] bg-white">
+                {renderDiagram()}
+              </div>
             </div>
-          </div>
+          </Tabs>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
