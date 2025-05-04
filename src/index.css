@@ -33,7 +33,7 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -116,6 +116,31 @@
   .pulse {
     @apply animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite];
   }
+  
+  /* Shine effect */
+  .shine {
+    @apply relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_1.5s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent;
+  }
+  
+  /* Glass card */
+  .glass-card {
+    @apply backdrop-blur-lg bg-white/10 border border-white/20 shadow-lg;
+  }
+  
+  /* Gradient button */
+  .gradient-btn {
+    @apply relative inline-block px-6 py-3 overflow-hidden font-bold rounded-md shadow-md transition-all duration-300 ease-out bg-gradient-to-r from-architect-vibrant to-architect hover:from-architect-magenta hover:to-architect-vibrant text-white;
+  }
+  
+  /* Animated gradient border */
+  .gradient-border {
+    @apply relative rounded-lg p-0.5 overflow-hidden bg-gradient-to-r from-architect via-architect-magenta to-architect-vibrant animate-rotate-color;
+  }
+  
+  /* Shiny text */
+  .shiny-text {
+    @apply inline-block bg-gradient-to-r from-architect to-architect-vibrant via-architect-highlight bg-[length:200%_auto] animate-background-shine bg-clip-text text-transparent;
+  }
 }
 
 /* Loading dots animation */
@@ -133,4 +158,11 @@
 /* Gradient text */
 .gradient-text {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-architect-dark to-architect-highlight;
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }
