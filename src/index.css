@@ -141,6 +141,16 @@
   .shiny-text {
     @apply inline-block bg-gradient-to-r from-architect to-architect-vibrant via-architect-highlight bg-[length:200%_auto] animate-background-shine bg-clip-text text-transparent;
   }
+
+  /* Hover input */
+  .hover-input {
+    @apply transition-all duration-300 border-2 focus:border-architect focus:ring-1 focus:ring-architect;
+  }
+
+  /* Border gradient for cards */
+  .border-gradient {
+    @apply border-2 transition-all duration-300 hover:shadow-lg hover:shadow-architect/20 overflow-hidden;
+  }
 }
 
 /* Loading dots animation */
